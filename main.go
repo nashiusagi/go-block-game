@@ -1,31 +1,149 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"image/color"
 	"math"
+	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 const (
-	screenWidth  = 800
-	screenHeight = 600
-	blockRows    = 5
-	blockCols    = 10
-	blockWidth   = 70
-	blockHeight  = 30
-	blockSpacing = 5
-	paddleWidth  = 100
-	paddleHeight = 20
-	ballRadius   = 10
-	ballSpeed    = 5.0
+	screenWidth       = 800
+	screenHeight      = 600
+	blockRows         = 5
+	blockCols         = 10
+	blockWidth        = 70
+	blockHeight       = 30
+	blockSpacing      = 5
+	paddleWidth       = 100
+	paddleHeight      = 20
+	ballRadius        = 10
+	ballSpeed         = 5.0
+	minPaddleGap      = 180.0
+	maxAttemptsFactor = 10
 )
+
+type LayoutConfig struct {
+	ScreenW, ScreenH float64
+	BlockW, BlockH   float64
+	BlockCount       int
+	MinPaddleGap     float64
+	PaddleY          float64
+	MaxAttempts      int
+	Seed             *int64
+}
+
+type RandomSource interface {
+	Float64() float64
+	Intn(n int) int
+	Seed(seed int64)
+}
+
+type defaultRandomSource struct {
+	r *rand.Rand
+}
+
+func (d *defaultRandomSource) Float64() float64 {
+	return d.r.Float64()
+}
+
+func (d *defaultRandomSource) Intn(n int) int {
+	return d.r.Intn(n)
+}
+
+func (d *defaultRandomSource) Seed(seed int64) {
+	d.r.Seed(seed)
+}
+
+func newRandomSource(seed *int64) RandomSource {
+	seedVal := time.Now().UnixNano()
+	if seed != nil {
+		seedVal = *seed
+	}
+	return &defaultRandomSource{
+		r: rand.New(rand.NewSource(seedVal)),
+	}
+}
+
+func newLayoutConfig(paddleY float64) LayoutConfig {
+	return LayoutConfig{
+		ScreenW:      screenWidth,
+		ScreenH:      screenHeight,
+		BlockW:       blockWidth,
+		BlockH:       blockHeight,
+		BlockCount:   blockRows * blockCols,
+		MinPaddleGap: minPaddleGap,
+		PaddleY:      paddleY,
+		MaxAttempts:  maxAttemptsFactor * blockRows * blockCols,
+		Seed:         nil,
+	}
+}
+
+func rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh float64) bool {
+	return ax < bx+bw && ax+aw > bx && ay < by+bh && ay+ah > by
+}
 
 type Block struct {
 	X, Y  float64
 	Alive bool
+}
+
+func GenerateBlocks(cfg LayoutConfig, rnd RandomSource) ([]Block, error) {
+	if cfg.BlockCount <= 0 {
+		return nil, errors.New("block count must be positive")
+	}
+	if cfg.MaxAttempts <= cfg.BlockCount {
+		return nil, errors.New("max attempts must exceed block count")
+	}
+	if cfg.MinPaddleGap <= 0 {
+		return nil, errors.New("min paddle gap must be positive")
+	}
+	if rnd == nil {
+		rnd = newRandomSource(cfg.Seed)
+	}
+
+	maxX := cfg.ScreenW - cfg.BlockW
+	maxY := cfg.PaddleY - cfg.MinPaddleGap - cfg.BlockH
+	if maxX <= 0 || maxY <= 0 {
+		return nil, errors.New("invalid layout bounds")
+	}
+
+	blocks := make([]Block, 0, cfg.BlockCount)
+	attempts := 0
+
+	for len(blocks) < cfg.BlockCount {
+		if attempts >= cfg.MaxAttempts {
+			return nil, errors.New("block placement exceeded max attempts")
+		}
+		attempts++
+
+		x := rnd.Float64() * maxX
+		y := rnd.Float64() * maxY
+
+		overlap := false
+		for _, b := range blocks {
+			if rectsOverlap(x, y, cfg.BlockW, cfg.BlockH, b.X, b.Y, cfg.BlockW, cfg.BlockH) {
+				overlap = true
+				break
+			}
+		}
+		if overlap {
+			continue
+		}
+
+		blocks = append(blocks, Block{
+			X:     x,
+			Y:     y,
+			Alive: true,
+		})
+	}
+
+	return blocks, nil
 }
 
 type Ball struct {
@@ -50,27 +168,33 @@ type Game struct {
 
 func NewGame() *Game {
 	g := &Game{}
-	g.initBlocks()
 	g.initBall()
 	g.initPaddle()
+	g.initBlocks()
 	return g
 }
 
 func (g *Game) initBlocks() {
-	g.blocks = make([]Block, blockRows*blockCols)
-	startX := (screenWidth - (blockCols*(blockWidth+blockSpacing) - blockSpacing)) / 2
-	startY := 50
-
-	for row := 0; row < blockRows; row++ {
-		for col := 0; col < blockCols; col++ {
-			idx := row*blockCols + col
-			g.blocks[idx] = Block{
-				X:     float64(startX + col*(blockWidth+blockSpacing)),
-				Y:     float64(startY + row*(blockHeight+blockSpacing)),
-				Alive: true,
+	cfg := newLayoutConfig(g.paddle.Y)
+	blocks, err := GenerateBlocks(cfg, newRandomSource(cfg.Seed))
+	if err != nil {
+		// フォールバック: 固定グリッド配置に切り替える
+		g.blocks = make([]Block, blockRows*blockCols)
+		startX := (screenWidth - (blockCols*(blockWidth+blockSpacing) - blockSpacing)) / 2
+		startY := 50
+		for row := 0; row < blockRows; row++ {
+			for col := 0; col < blockCols; col++ {
+				idx := row*blockCols + col
+				g.blocks[idx] = Block{
+					X:     float64(startX + col*(blockWidth+blockSpacing)),
+					Y:     float64(startY + row*(blockHeight+blockSpacing)),
+					Alive: true,
+				}
 			}
 		}
+		return
 	}
+	g.blocks = blocks
 }
 
 func (g *Game) initBall() {
