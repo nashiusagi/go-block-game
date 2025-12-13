@@ -49,7 +49,7 @@ func TestGenerateBlocksDeterministic(t *testing.T) {
 	for i := 0; i < len(blocks); i++ {
 		for j := i + 1; j < len(blocks); j++ {
 			if rectanglesOverlap(blocks[i], blocks[j], cfg.BlockW, cfg.BlockH) {
-				t.Fatalf("blocks %d and %j overlap", i, j)
+				t.Fatalf("blocks %d and %d overlap", i, j)
 			}
 		}
 	}
@@ -100,4 +100,3 @@ func TestInitBlocksIntegration(t *testing.T) {
 		}
 	}
 }
-
