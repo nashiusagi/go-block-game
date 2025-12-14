@@ -1,8 +1,8 @@
 package adapter
 
 import (
-	"block-game/application"
-	"block-game/infrastructure/view"
+	"block-game/internal/application"
+	"block-game/internal/infrastructure/view"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

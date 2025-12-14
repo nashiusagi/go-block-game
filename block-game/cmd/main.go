@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"block-game/application"
-	"block-game/config"
-	"block-game/domain"
-	"block-game/infrastructure/adapter"
-	"block-game/infrastructure/input"
-	"block-game/infrastructure/view"
+	"block-game/internal/application"
+	"block-game/internal/infrastructure/adapter"
+	"block-game/internal/infrastructure/input"
+	"block-game/internal/infrastructure/view"
+	"block-game/pkg/config"
+	"block-game/pkg/domain"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

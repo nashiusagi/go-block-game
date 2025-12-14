@@ -3,8 +3,8 @@ package application
 import (
 	"testing"
 
-	"block-game/config"
-	"block-game/domain"
+	"block-game/pkg/config"
+	"block-game/pkg/domain"
 )
 
 type fakeInput struct {

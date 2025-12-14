@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image/color"
 
-	"block-game/domain"
+	"block-game/pkg/domain"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"

@@ -3,10 +3,10 @@ package adapter
 import (
 	"testing"
 
-	"block-game/application"
-	"block-game/config"
-	"block-game/domain"
-	"block-game/infrastructure/view"
+	"block-game/internal/application"
+	"block-game/internal/infrastructure/view"
+	"block-game/pkg/config"
+	"block-game/pkg/domain"
 )
 
 type fakeRenderer struct {

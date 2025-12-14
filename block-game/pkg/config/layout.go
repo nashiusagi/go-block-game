@@ -1,6 +1,6 @@
 package config
 
-import "block-game/domain"
+import "block-game/pkg/domain"
 
 const (
 	ScreenWidth       = 800
