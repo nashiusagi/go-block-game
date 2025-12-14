@@ -21,6 +21,12 @@ func NewRenderer(layout domain.LayoutConfig) *Renderer {
 func (r *Renderer) Render(screen *ebiten.Image, state *domain.GameState) {
 	screen.Fill(color.RGBA{0, 0, 0, 255})
 
+	for _, item := range state.Items {
+		if item.Active {
+			ebitenutil.DrawRect(screen, item.X, item.Y, item.Width, item.Height, color.RGBA{255, 200, 50, 255})
+		}
+	}
+
 	for _, block := range state.Blocks {
 		if block.Alive {
 			ebitenutil.DrawRect(screen, block.X, block.Y, r.layout.BlockW, r.layout.BlockH, color.RGBA{100, 200, 255, 255})
@@ -29,7 +35,9 @@ func (r *Renderer) Render(screen *ebiten.Image, state *domain.GameState) {
 	}
 
 	ebitenutil.DrawRect(screen, state.Paddle.X, state.Paddle.Y, state.Paddle.Width, state.Paddle.Height, color.RGBA{255, 255, 255, 255})
-	ebitenutil.DrawCircle(screen, state.Ball.X, state.Ball.Y, state.Ball.Radius, color.RGBA{255, 255, 0, 255})
+	for _, ball := range state.Balls {
+		ebitenutil.DrawCircle(screen, ball.X, ball.Y, ball.Radius, color.RGBA{255, 255, 0, 255})
+	}
 
 	scoreText := "Score: " + fmt.Sprintf("%d", state.Score)
 	ebitenutil.DebugPrint(screen, scoreText)

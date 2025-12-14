@@ -16,6 +16,7 @@ type GameUsecase struct {
 	state  *domain.GameState
 	layout domain.LayoutConfig
 	input  InputPort
+	rnd    domain.RandomSource
 }
 
 func NewGameUsecase(layout domain.LayoutConfig, rnd domain.RandomSource, input InputPort) (*GameUsecase, error) {
@@ -28,16 +29,20 @@ func NewGameUsecase(layout domain.LayoutConfig, rnd domain.RandomSource, input I
 		blocks = domain.GenerateGridFallback(layout)
 	}
 	state := domain.NewGameState(layout, blocks)
+	if rnd == nil {
+		rnd = domain.NewRandomSource(layout.Seed)
+	}
 
 	return &GameUsecase{
 		state:  state,
 		layout: layout,
 		input:  input,
+		rnd:    rnd,
 	}, nil
 }
 
 func (g *GameUsecase) Update() error {
-	domain.Advance(g.state, g.input.Read(), g.layout)
+	domain.Advance(g.state, g.input.Read(), g.layout, g.rnd)
 	return nil
 }
 

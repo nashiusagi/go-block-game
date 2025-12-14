@@ -18,26 +18,38 @@ const (
 	BallSpeed         = 5.0
 	MinPaddleGap      = 180.0
 	MaxAttemptsFactor = 10
+	ItemDropChance    = 0.1
+	ItemMaxCount      = 3
+	ItemFallSpeed     = 3.0
+	ItemWidth         = 16.0
+	ItemHeight        = 12.0
+	MaxBalls          = 8
 )
 
 func DefaultLayoutConfig() domain.LayoutConfig {
 	return domain.LayoutConfig{
-		ScreenW:      ScreenWidth,
-		ScreenH:      ScreenHeight,
-		BlockW:       BlockWidth,
-		BlockH:       BlockHeight,
-		BlockRows:    BlockRows,
-		BlockCols:    BlockCols,
-		BlockSpacing: BlockSpacing,
-		PaddleWidth:  PaddleWidth,
-		PaddleHeight: PaddleHeight,
-		PaddleY:      PaddleY,
-		PaddleSpeed:  PaddleSpeed,
-		BallRadius:   BallRadius,
-		BallSpeed:    BallSpeed,
-		BlockCount:   BlockRows * BlockCols,
-		MinPaddleGap: MinPaddleGap,
-		MaxAttempts:  MaxAttemptsFactor * BlockRows * BlockCols,
-		Seed:         nil,
+		ScreenW:        ScreenWidth,
+		ScreenH:        ScreenHeight,
+		BlockW:         BlockWidth,
+		BlockH:         BlockHeight,
+		BlockRows:      BlockRows,
+		BlockCols:      BlockCols,
+		BlockSpacing:   BlockSpacing,
+		PaddleWidth:    PaddleWidth,
+		PaddleHeight:   PaddleHeight,
+		PaddleY:        PaddleY,
+		PaddleSpeed:    PaddleSpeed,
+		BallRadius:     BallRadius,
+		BallSpeed:      BallSpeed,
+		BlockCount:     BlockRows * BlockCols,
+		MinPaddleGap:   MinPaddleGap,
+		MaxAttempts:    MaxAttemptsFactor * BlockRows * BlockCols,
+		MaxBalls:       MaxBalls,
+		ItemDropChance: ItemDropChance,
+		MaxItems:       ItemMaxCount,
+		ItemWidth:      ItemWidth,
+		ItemHeight:     ItemHeight,
+		ItemFallSpeed:  ItemFallSpeed,
+		Seed:           nil,
 	}
 }
