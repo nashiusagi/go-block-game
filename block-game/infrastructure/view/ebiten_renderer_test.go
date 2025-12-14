@@ -3,8 +3,8 @@ package view
 import (
 	"testing"
 
-	"block-game/src/config"
-	"block-game/src/domain"
+	"block-game/config"
+	"block-game/domain"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

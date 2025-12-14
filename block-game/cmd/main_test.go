@@ -4,9 +4,9 @@ import (
 	"math"
 	"testing"
 
-	"block-game/src/application"
-	"block-game/src/config"
-	"block-game/src/domain"
+	"block-game/application"
+	"block-game/config"
+	"block-game/domain"
 )
 
 func floatEquals(a, b, eps float64) bool {

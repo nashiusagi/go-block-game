@@ -1,7 +1,7 @@
 package input
 
 import (
-	"block-game/src/domain"
+	"block-game/domain"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

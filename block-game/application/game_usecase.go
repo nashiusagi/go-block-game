@@ -3,7 +3,7 @@ package application
 import (
 	"errors"
 
-	"block-game/src/domain"
+	"block-game/domain"
 )
 
 var ErrNilInputPort = errors.New("input port is nil")
