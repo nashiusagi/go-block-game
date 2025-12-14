@@ -6,7 +6,7 @@ BIN_DIR := bin
 .PHONY: run lint fmt test build
 
 run:
-	$(GO) run .
+	$(GO) run cmd/main.go
 
 lint:
 	$(GO) vet $(PKG)
@@ -18,7 +18,7 @@ test:
 	$(GO) test $(PKG)
 
 build: $(BIN_DIR)
-	$(GO) build -o $(BIN_DIR)/$(BIN) ./...
+	$(GO) build -o $(BIN_DIR)/$(BIN) cmd/main.go
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
