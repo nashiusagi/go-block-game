@@ -20,6 +20,12 @@ type LayoutConfig struct {
 	BlockCount                int
 	MinPaddleGap              float64
 	MaxAttempts               int
+	MaxBalls                  int
+	ItemDropChance            float64
+	MaxItems                  int
+	ItemWidth                 float64
+	ItemHeight                float64
+	ItemFallSpeed             float64
 	Seed                      *int64
 }
 

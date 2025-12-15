@@ -50,4 +50,7 @@ func TestUpdateAppliesInput(t *testing.T) {
 	if usecase.State().Paddle.X <= initialX {
 		t.Fatalf("expected paddle to move right")
 	}
+	if len(usecase.State().Balls) == 0 {
+		t.Fatalf("expected at least one ball after update")
+	}
 }
