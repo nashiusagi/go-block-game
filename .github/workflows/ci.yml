@@ -48,6 +48,8 @@ jobs:
 
   unit-test:
     runs-on: ubuntu-22.04
+    env:
+      DISPLAY: :0
     needs: [ format-check, lint ]
     steps:
       - name: Checkout
