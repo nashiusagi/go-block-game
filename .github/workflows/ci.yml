@@ -66,4 +66,4 @@ jobs:
           cache: false
 
       - name: Run Unit Test
-        run: make test 
+        run: xvfb-run -a make test 
