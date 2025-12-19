@@ -1,5 +1,6 @@
 GO ?= go
-PKG := ./...
+GOFMT ?= gofmt "-s"
+GOFILES := $(shell find . -name "*.go")
 BIN := block-game
 BIN_DIR := bin
 
@@ -9,13 +10,21 @@ run:
 	$(GO) run cmd/main.go
 
 lint:
-	$(GO) vet $(PKG)
+	$(GO) vet ./... 
 
 fmt:
-	$(GO) fmt $(PKG)
+	$(GOFMT) -w $(GOFILES)
+
+fmt-check:
+	@diff=$$($(GOFMT) -d $(GOFILES)); \
+	if [ -n "$$diff" ]; then \
+		echo "Please run 'make fmt' and commit the result:"; \
+		echo "$${diff}"; \
+		exit 1; \
+	fi;
 
 test:
-	$(GO) test $(PKG)
+	$(GO) test ./... 
 
 build: $(BIN_DIR)
 	$(GO) build -o $(BIN_DIR)/$(BIN) cmd/main.go
