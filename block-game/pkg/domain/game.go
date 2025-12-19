@@ -126,10 +126,20 @@ func updateBalls(state *GameState, cfg LayoutConfig, rnd RandomSource) {
 
 		if ball.X-ball.Radius <= 0 || ball.X+ball.Radius >= cfg.ScreenW {
 			ball.VX = -ball.VX
+			// 壁の内側に押し戻すことで連続反射による滑りを防ぐ
+			if ball.X-ball.Radius < 0 {
+				ball.X = ball.Radius
+			} else if ball.X+ball.Radius > cfg.ScreenW {
+				ball.X = cfg.ScreenW - ball.Radius
+			}
 		}
 
 		if ball.Y-ball.Radius <= 0 {
 			ball.VY = -ball.VY
+			// 上壁との衝突後に位置を補正
+			if ball.Y-ball.Radius < 0 {
+				ball.Y = ball.Radius
+			}
 		}
 
 		if ball.Y+ball.Radius > cfg.ScreenH {
