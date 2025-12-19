@@ -37,11 +37,9 @@ jobs:
         with:
           cache: false
 
-      - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.58.1
-          args: --verbose
+      - name: Run Lint 
+        run: make lint
+
 
   unit-test:
     runs-on: ubuntu-22.04
