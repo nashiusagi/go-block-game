@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "./block-game"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "gomod"
+      - "library update"

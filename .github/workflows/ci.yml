@@ -1,0 +1,69 @@
+---
+name: CI workflows
+
+on:
+  push: 
+    branches-ignore:
+      - main 
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./block-game
+
+jobs:
+  format-check:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+
+      - name: Run Format Check
+        run: make fmt-check
+    
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+
+      - name: Run Lint 
+        run: make lint
+
+
+  unit-test:
+    runs-on: ubuntu-22.04
+    env:
+      DISPLAY: :0
+    needs: [ format-check, lint ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          cache: false
+
+      - name: Run Unit Test
+        run: xvfb-run -a make test 
