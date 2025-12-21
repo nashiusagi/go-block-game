@@ -115,7 +115,13 @@ func updateItems(state *GameState, cfg LayoutConfig) {
 		item.Y += item.VY
 
 		if rectsOverlap(item.X, item.Y, item.Width, item.Height, state.Paddle.X, state.Paddle.Y, state.Paddle.Width, state.Paddle.Height) {
-			applyMultiball(state, cfg)
+			// Apply effect based on item type
+			switch item.Type {
+			case ItemTypeMultiball:
+				applyMultiball(state, cfg)
+			case ItemTypePaddleEnlarge:
+				applyPaddleEnlarge(state, cfg)
+			}
 			item.Active = false
 		} else if item.Y > cfg.ScreenH {
 			item.Active = false
@@ -178,4 +184,19 @@ func applyMultiball(state *GameState, cfg LayoutConfig) {
 	}
 
 	state.Balls = newBalls
+}
+
+// applyPaddleEnlarge activates the paddle enlargement effect.
+// If already active, it resets the duration timer.
+func applyPaddleEnlarge(state *GameState, cfg LayoutConfig) {
+	effect := &state.PaddleEffect
+	if !effect.Active {
+		// First activation: save base width and enlarge
+		effect.BaseWidth = state.Paddle.Width
+		effect.Multiplier = cfg.PaddleEnlargeMultiplier
+		state.Paddle.Width = effect.BaseWidth * effect.Multiplier
+	}
+	// (Re)set timer
+	effect.Active = true
+	effect.RemainingTicks = cfg.PaddleEnlargeDuration
 }

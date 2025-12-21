@@ -32,7 +32,7 @@
   - _Requirements: 1.1, 1.2, 1.5_
 
 - [ ] 4. アイテム衝突処理拡張（updateItems）
-- [ ] 4.1 updateItems でアイテム種別に応じた効果適用に分岐
+- [x] 4.1 updateItems でアイテム種別に応じた効果適用に分岐
   - `ItemTypeMultiball` → `applyMultiball`（既存）
   - `ItemTypePaddleEnlarge` → `applyPaddleEnlarge`（新規）
   - _Requirements: 1.3, 1.4, 2.1_
