@@ -6,7 +6,7 @@
 
 ## Tasks
 
-- [ ] 1. ドメインモデル拡張（Item.Type / PaddleEffect）
+- [x ] 1. ドメインモデル拡張（Item.Type / PaddleEffect）
 - [x] 1.1 ItemType 列挙と Item 構造体への Type フィールド追加
   - `ItemTypeMultiball`, `ItemTypePaddleEnlarge` を定義
   - 既存コードで Item 生成箇所に `Type: ItemTypeMultiball` を追加
@@ -16,7 +16,7 @@
   - `GameState` に `PaddleEffect PaddleEffect` フィールド追加
   - _Requirements: 2.1, 2.2, 2.4_
 
-- [ ] 2. Config 定数追加
+- [x ] 2. Config 定数追加
 - [x] 2.1 pkg/config/layout.go に PaddleEnlarge 関連定数を追加 (P)
   - `PaddleEnlargeChance = 0.02`
   - `PaddleEnlargeDuration = 300` (5秒 @ 60FPS)
@@ -24,20 +24,20 @@
   - LayoutConfig に `PaddleEnlargeChance float64` フィールド追加
   - _Requirements: 1.1, 2.1_
 
-- [ ] 3. アイテムスポーン拡張（tryDropItem）
+- [x] 3. アイテムスポーン拡張（tryDropItem）
 - [x] 3.1 tryDropItem を拡張しパドル拡大アイテムの独立抽選を追加
   - マルチボール抽選（既存 ItemDropChance）とパドル拡大抽選（PaddleEnlargeChance）を別々に実行
   - 共通の spawnItem ヘルパーで Item 生成を統一
   - MaxItems 上限チェックは全アイテム合計で適用
   - _Requirements: 1.1, 1.2, 1.5_
 
-- [ ] 4. アイテム衝突処理拡張（updateItems）
+- [x] 4. アイテム衝突処理拡張（updateItems）
 - [x] 4.1 updateItems でアイテム種別に応じた効果適用に分岐
   - `ItemTypeMultiball` → `applyMultiball`（既存）
   - `ItemTypePaddleEnlarge` → `applyPaddleEnlarge`（新規）
   - _Requirements: 1.3, 1.4, 2.1_
 
-- [ ] 5. パドル拡大効果ロジック（applyPaddleEnlarge / updatePaddleEffect）
+- [x] 5. パドル拡大効果ロジック（applyPaddleEnlarge / updatePaddleEffect）
 - [x] 5.1 applyPaddleEnlarge を実装
   - 効果未適用時: BaseWidth を保存し、幅を 3倍に設定
   - 効果適用中: 幅は維持し RemainingTicks をリセット
@@ -47,7 +47,7 @@
   - 0 以下になったら幅を BaseWidth に戻し Active = false
   - _Requirements: 2.4, 2.5_
 
-- [ ] 6. 描画対応（Renderer）
+- [x] 6. 描画対応（Renderer）
 - [x] 6.1 アイテム種別に応じた色分け描画
   - マルチボール: 既存色（黄系）
   - パドル拡大: 別色（緑系など）
@@ -56,7 +56,7 @@
   - 効果中はパドル色を変化（例: 白→シアン）または残り時間表示
   - _Requirements: 3.2, 3.3_
 
-- [ ] 7. テスト
+- [x] 7. テスト
 - [x] 7.1 tryDropItem のユニットテスト追加
   - 2%確率でパドル拡大アイテムがスポーンすること
   - マルチボールと独立に抽選されること
