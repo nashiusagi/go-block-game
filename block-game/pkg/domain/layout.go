@@ -26,6 +26,7 @@ type LayoutConfig struct {
 	ItemWidth                 float64
 	ItemHeight                float64
 	ItemFallSpeed             float64
+	Difficulty                Difficulty
 	Seed                      *int64
 }
 
@@ -88,6 +89,17 @@ func GenerateBlocks(cfg LayoutConfig, rnd RandomSource) ([]Block, error) {
 	maxY := cfg.PaddleY - cfg.MinPaddleGap - cfg.BlockH
 	if maxX <= 0 || maxY <= 0 {
 		return nil, errors.New("invalid layout bounds")
+	}
+
+	// Capacity check: rough upper bound based on axis-aligned tiling without spacing.
+	cols := int(math.Floor(cfg.ScreenW / cfg.BlockW))
+	rows := int(math.Floor((cfg.PaddleY - cfg.MinPaddleGap) / cfg.BlockH))
+	if cols <= 0 || rows <= 0 {
+		return nil, errors.New("insufficient space for blocks")
+	}
+	capacity := cols * rows
+	if capacity < cfg.BlockCount {
+		return nil, errors.New("insufficient space for blocks")
 	}
 
 	blocks := make([]Block, 0, cfg.BlockCount)

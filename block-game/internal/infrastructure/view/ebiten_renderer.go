@@ -21,6 +21,9 @@ func NewRenderer(layout domain.LayoutConfig) *Renderer {
 func (r *Renderer) Render(screen *ebiten.Image, state *domain.GameState) {
 	screen.Fill(color.RGBA{0, 0, 0, 255})
 
+	diffText := fmt.Sprintf("Difficulty: %s", r.layout.Difficulty)
+	ebitenutil.DebugPrintAt(screen, diffText, 0, 0)
+
 	for _, item := range state.Items {
 		if item.Active {
 			ebitenutil.DrawRect(screen, item.X, item.Y, item.Width, item.Height, color.RGBA{255, 200, 50, 255})
@@ -40,7 +43,7 @@ func (r *Renderer) Render(screen *ebiten.Image, state *domain.GameState) {
 	}
 
 	scoreText := "Score: " + fmt.Sprintf("%d", state.Score)
-	ebitenutil.DebugPrint(screen, scoreText)
+	ebitenutil.DebugPrintAt(screen, scoreText, 0, 16)
 
 	if state.GameOver {
 		gameOverText := "GAME OVER"

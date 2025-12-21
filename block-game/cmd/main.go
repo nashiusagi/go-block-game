@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"block-game/internal/application"
@@ -14,7 +15,14 @@ import (
 )
 
 func main() {
-	layout := config.DefaultLayoutConfig()
+	diffFlag := flag.String("difficulty", string(domain.DifficultyNormal), "difficulty: EASY|NORMAL|HARD")
+	flag.Parse()
+
+	layout, applied, err := config.LayoutWithDifficulty(*diffFlag)
+	if err != nil {
+		log.Printf("difficulty selection error: requested=%q fallback=%s err=%v", *diffFlag, applied, err)
+	}
+
 	rnd := domain.NewRandomSource(layout.Seed)
 	inputPort := input.NewEbitenInputAdapter()
 
