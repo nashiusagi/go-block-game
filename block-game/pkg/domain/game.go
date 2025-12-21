@@ -10,21 +10,39 @@ type Paddle struct {
 	Height float64
 }
 
+// ItemType represents the type of a falling item.
+type ItemType int
+
+const (
+	ItemTypeMultiball ItemType = iota
+	ItemTypePaddleEnlarge
+)
+
 type Item struct {
 	X, Y   float64
 	Width  float64
 	Height float64
 	VY     float64
 	Active bool
+	Type   ItemType
+}
+
+// PaddleEffect tracks the temporary paddle enlargement state.
+type PaddleEffect struct {
+	Active         bool
+	RemainingTicks int     // 60FPS: 5 seconds = 300 ticks
+	BaseWidth      float64 // original paddle width before effect
+	Multiplier     float64 // e.g., 3.0
 }
 
 type GameState struct {
-	Blocks   []Block
-	Balls    []Ball
-	Paddle   Paddle
-	Items    []Item
-	Score    int
-	GameOver bool
+	Blocks       []Block
+	Balls        []Ball
+	Paddle       Paddle
+	Items        []Item
+	PaddleEffect PaddleEffect
+	Score        int
+	GameOver     bool
 }
 
 type InputState struct {
@@ -124,6 +142,7 @@ func tryDropItem(state *GameState, cfg LayoutConfig, block *Block, rnd RandomSou
 		Height: cfg.ItemHeight,
 		VY:     cfg.ItemFallSpeed,
 		Active: true,
+		Type:   ItemTypeMultiball,
 	})
 }
 

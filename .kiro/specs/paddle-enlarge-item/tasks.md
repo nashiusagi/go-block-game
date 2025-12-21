@@ -7,11 +7,11 @@
 ## Tasks
 
 - [ ] 1. ドメインモデル拡張（Item.Type / PaddleEffect）
-- [ ] 1.1 ItemType 列挙と Item 構造体への Type フィールド追加
+- [x] 1.1 ItemType 列挙と Item 構造体への Type フィールド追加
   - `ItemTypeMultiball`, `ItemTypePaddleEnlarge` を定義
   - 既存コードで Item 生成箇所に `Type: ItemTypeMultiball` を追加
   - _Requirements: 1.1, 1.2, 3.1_
-- [ ] 1.2 PaddleEffect 構造体を追加し GameState に組み込む (P)
+- [x] 1.2 PaddleEffect 構造体を追加し GameState に組み込む (P)
   - `Active bool`, `RemainingTicks int`, `BaseWidth float64`, `Multiplier float64`
   - `GameState` に `PaddleEffect PaddleEffect` フィールド追加
   - _Requirements: 2.1, 2.2, 2.4_
