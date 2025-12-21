@@ -3,9 +3,11 @@ package adapter
 import (
 	"fmt"
 	"image/color"
+	"log"
 
 	"block-game/internal/application"
 	"block-game/internal/infrastructure/view"
+	"block-game/pkg/config"
 	"block-game/pkg/domain"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -31,12 +33,16 @@ type EbitenGame struct {
 	prevDown     bool
 	prevLeft     bool
 	prevRight    bool
+	baseLayout   domain.LayoutConfig
+	input        application.InputPort
+	statusMsg    string
 }
 
-func NewEbitenGame(usecase *application.GameUsecase, renderer *view.Renderer) *EbitenGame {
+func NewEbitenGame(input application.InputPort) *EbitenGame {
+	base := config.DefaultLayoutConfig()
 	return &EbitenGame{
-		usecase:      usecase,
-		renderer:     renderer,
+		usecase:      nil,
+		renderer:     nil,
 		scene:        sceneTitle,
 		selectedDiff: domain.DifficultyNormal, // デフォルト表示
 		selectedIdx:  1,
@@ -50,6 +56,8 @@ func NewEbitenGame(usecase *application.GameUsecase, renderer *view.Renderer) *E
 			domain.DifficultyNormal: "標準の設定",
 			domain.DifficultyHard:   "球が速くブロックが多い（チャレンジ）",
 		},
+		baseLayout: base,
+		input:      input,
 	}
 }
 
@@ -59,6 +67,10 @@ func (g *EbitenGame) Update() error {
 		g.handleTitleInput()
 		g.handleTitleMouse()
 		if ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeySpace) {
+			if err := g.startGame(); err != nil {
+				log.Printf("failed to start game with difficulty %s: %v", g.selectedDiff, err)
+				return nil
+			}
 			g.scene = scenePlaying
 		}
 		return nil
@@ -74,17 +86,20 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 	case sceneTitle:
 		g.renderTitle(screen)
 	case scenePlaying:
+		if g.renderer == nil || g.usecase == nil {
+			return
+		}
 		g.renderer.Render(screen, g.usecase.State())
 	}
 }
 
 func (g *EbitenGame) Layout(outsideWidth, outsideHeight int) (int, int) {
-	layout := g.usecase.Layout()
+	layout := g.currentLayout()
 	return int(layout.ScreenW), int(layout.ScreenH)
 }
 
 func (g *EbitenGame) renderTitle(screen *ebiten.Image) {
-	layout := g.usecase.Layout()
+	layout := g.currentLayout()
 	screen.Fill(color.RGBA{0, 0, 0, 255})
 
 	title := "BLOCK GAME"
@@ -108,6 +123,9 @@ func (g *EbitenGame) renderTitle(screen *ebiten.Image) {
 	}
 
 	ebitenutil.DebugPrintAt(screen, prompt, startX, startY+80)
+	if g.statusMsg != "" {
+		ebitenutil.DebugPrintAt(screen, g.statusMsg, startX, startY+96)
+	}
 }
 
 // handleTitleInput handles keyboard selection (up/down/left/right) on the title screen.
@@ -167,4 +185,34 @@ func (g *EbitenGame) moveSelection(delta int) {
 	}
 	g.selectedIdx = (g.selectedIdx + delta + count) % count
 	g.selectedDiff = g.options[g.selectedIdx]
+}
+
+func (g *EbitenGame) startGame() error {
+	layout, applied, err := config.LayoutWithDifficulty(string(g.selectedDiff))
+	if err != nil {
+		msg := fmt.Sprintf("fallback to %s (invalid: %s)", applied, g.selectedDiff)
+		log.Printf("difficulty selection error: requested=%q fallback=%s err=%v", g.selectedDiff, applied, err)
+		g.statusMsg = msg
+	}
+	if applied != g.selectedDiff {
+		g.statusMsg = fmt.Sprintf("fallback to %s (invalid: %s)", applied, g.selectedDiff)
+	}
+	rnd := domain.NewRandomSource(layout.Seed)
+
+	usecase, err := application.NewGameUsecase(layout, rnd, g.input)
+	if err != nil {
+		return err
+	}
+
+	g.usecase = usecase
+	g.renderer = view.NewRenderer(layout)
+	g.selectedDiff = applied
+	return nil
+}
+
+func (g *EbitenGame) currentLayout() domain.LayoutConfig {
+	if g.usecase != nil {
+		return g.usecase.Layout()
+	}
+	return g.baseLayout
 }
