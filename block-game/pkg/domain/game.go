@@ -86,6 +86,7 @@ func Advance(state *GameState, input InputState, cfg LayoutConfig, rnd RandomSou
 	}
 
 	updateItems(state, cfg)
+	updatePaddleEffect(state)
 
 	ballService.Advance(state, cfg, rnd)
 
@@ -199,4 +200,18 @@ func applyPaddleEnlarge(state *GameState, cfg LayoutConfig) {
 	// (Re)set timer
 	effect.Active = true
 	effect.RemainingTicks = cfg.PaddleEnlargeDuration
+}
+
+// updatePaddleEffect decrements the effect timer and reverts paddle width when expired.
+func updatePaddleEffect(state *GameState) {
+	effect := &state.PaddleEffect
+	if !effect.Active {
+		return
+	}
+	effect.RemainingTicks--
+	if effect.RemainingTicks <= 0 {
+		state.Paddle.Width = effect.BaseWidth
+		effect.Active = false
+		effect.RemainingTicks = 0
+	}
 }

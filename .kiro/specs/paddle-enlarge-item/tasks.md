@@ -38,11 +38,11 @@
   - _Requirements: 1.3, 1.4, 2.1_
 
 - [ ] 5. パドル拡大効果ロジック（applyPaddleEnlarge / updatePaddleEffect）
-- [ ] 5.1 applyPaddleEnlarge を実装
+- [x] 5.1 applyPaddleEnlarge を実装
   - 効果未適用時: BaseWidth を保存し、幅を 3倍に設定
   - 効果適用中: 幅は維持し RemainingTicks をリセット
   - _Requirements: 2.1, 2.2, 2.3_
-- [ ] 5.2 updatePaddleEffect を実装し Advance から呼び出す
+- [x] 5.2 updatePaddleEffect を実装し Advance から呼び出す
   - 毎フレーム RemainingTicks をデクリメント
   - 0 以下になったら幅を BaseWidth に戻し Active = false
   - _Requirements: 2.4, 2.5_
