@@ -25,10 +25,10 @@
   - _Requirements: 2.4,2.5,4.1_
 
 - [ ] 3. 初期化フローと状態管理
-- [ ] 3.1 ゲーム開始前の難易度選択フローを追加（未選択時は NORMAL を適用）
+- [x] 3.1 ゲーム開始前の難易度選択フローを追加（未選択時は NORMAL を適用）
   - 入力/設定値から Difficulty を決定し、一ゲームセッションのみ保持
   - _Requirements: 1.1,1.2,1.3,1.4_
-- [ ] 3.2 NewGameState/initBlocks 周辺で ApplyDifficulty を適用し、生成したコンフィグで Blocks/Balls/Paddle を初期化
+- [x] 3.2 NewGameState/initBlocks 周辺で ApplyDifficulty を適用し、生成したコンフィグで Blocks/Balls/Paddle を初期化
   - HARD で BlockCount 増加時も MaxBalls/Items の上限に注意（必要なら合わせて調整）
   - _Requirements: 1.3,2.1,2.2,2.3,2.4,2.5,3.3,4.1_
 

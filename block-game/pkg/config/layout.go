@@ -1,6 +1,9 @@
 package config
 
-import "block-game/pkg/domain"
+import (
+	"block-game/pkg/domain"
+	"strings"
+)
 
 const (
 	ScreenWidth       = 800
@@ -53,4 +56,21 @@ func DefaultLayoutConfig() domain.LayoutConfig {
 		Difficulty:     domain.DifficultyNormal,
 		Seed:           nil,
 	}
+}
+
+// LayoutWithDifficulty returns a LayoutConfig with the requested difficulty applied.
+// If the requested difficulty is invalid, it falls back to the default.
+func LayoutWithDifficulty(selected string) (domain.LayoutConfig, domain.Difficulty, error) {
+	base := DefaultLayoutConfig()
+	profile := domain.DefaultDifficultyProfile()
+	validator := domain.NewDifficultyValidator(profile.Default)
+
+	normalized := domain.Difficulty(strings.ToUpper(strings.TrimSpace(selected)))
+	setting, applied, errValidate := validator.Validate(profile, normalized)
+
+	derived, errApply := domain.ApplyDifficulty(base, setting)
+	if errApply != nil {
+		return base, applied, errApply
+	}
+	return derived, applied, errValidate
 }
