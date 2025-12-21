@@ -40,12 +40,12 @@
   - _Requirements: 3.3,4.1,4.2_
 
 - [ ] 5. テスト
-- [ ] 5.1 ApplyDifficulty/DifficultyValidator のユニットテストを追加
+- [x] 5.1 ApplyDifficulty/DifficultyValidator のユニットテストを追加
   - スケール適用、クランプ、無効値フォールバック、BlockCount 増加時の MaxAttempts 増加を検証
   - _Requirements: 2.x,3.3,4.x_
-- [ ] 5.2 GenerateBlocks 統合テストを追加し、HARD 設定で配置が成功することと NORMAL で従来挙動が維持されることを確認
+- [x] 5.2 GenerateBlocks 統合テストを追加し、HARD 設定で配置が成功することと NORMAL で従来挙動が維持されることを確認
   - _Requirements: 2.4,2.5,3.1,3.2_
-- [ ] 5.3 難易度ラベル表示とデフォルト適用のテストを追加
+- [x] 5.3 難易度ラベル表示とデフォルト適用のテストを追加
   - 未選択→NORMAL、無効値→NORMAL、表示文言の一貫性を確認
   - _Requirements: 1.x,3.x_
 

@@ -117,3 +117,31 @@ func TestGenerateGridFallback(t *testing.T) {
 		t.Fatalf("fallback block has negative position: (%f,%f)", blocks[0].X, blocks[0].Y)
 	}
 }
+
+func TestGenerateBlocksHardLayoutIntegration(t *testing.T) {
+	base := baseLayout()
+	base.BlockCount = 50
+	base.MaxAttempts = 500
+	// Apply HARD-like scales: smaller blocks, more count, faster ball
+	setting := DifficultySetting{
+		Name:             DifficultyHard,
+		BallSpeedScale:   1.2,
+		BallRadiusScale:  0.9,
+		PaddleWidthScale: 0.9,
+		PaddleSpeedScale: 0.9,
+		BlockSizeScale:   0.9,
+		BlockCountScale:  1.3,
+	}
+	derived, err := ApplyDifficulty(base, setting)
+	if err != nil {
+		t.Fatalf("apply difficulty failed: %v", err)
+	}
+
+	blocks, err := GenerateBlocks(derived, nil)
+	if err != nil {
+		t.Fatalf("generate blocks failed for hard layout: %v", err)
+	}
+	if len(blocks) != derived.BlockCount {
+		t.Fatalf("expected %d blocks, got %d", derived.BlockCount, len(blocks))
+	}
+}

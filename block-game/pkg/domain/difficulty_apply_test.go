@@ -51,18 +51,11 @@ func TestApplyDifficultyScalesValues(t *testing.T) {
 	if derived.BallSpeed != base.BallSpeed*setting.BallSpeedScale {
 		t.Fatalf("ball speed not scaled")
 	}
-	if derived.BallRadius != base.BallRadius*setting.BallRadiusScale {
-		t.Fatalf("ball radius not scaled")
-	}
-	if derived.PaddleWidth != base.PaddleWidth*setting.PaddleWidthScale {
-		t.Fatalf("paddle width not scaled")
-	}
-	if derived.PaddleSpeed != base.PaddleSpeed*setting.PaddleSpeedScale {
-		t.Fatalf("paddle speed not scaled")
-	}
-	if derived.BlockW != base.BlockW*setting.BlockSizeScale || derived.BlockH != base.BlockH*setting.BlockSizeScale {
-		t.Fatalf("block size not scaled")
-	}
+	assertFloatClose(t, derived.BallRadius, base.BallRadius*setting.BallRadiusScale, "ball radius not scaled")
+	assertFloatClose(t, derived.PaddleWidth, base.PaddleWidth*setting.PaddleWidthScale, "paddle width not scaled")
+	assertFloatClose(t, derived.PaddleSpeed, base.PaddleSpeed*setting.PaddleSpeedScale, "paddle speed not scaled")
+	assertFloatClose(t, derived.BlockW, base.BlockW*setting.BlockSizeScale, "block width not scaled")
+	assertFloatClose(t, derived.BlockH, base.BlockH*setting.BlockSizeScale, "block height not scaled")
 
 	expectedCount := int(math.Round(float64(base.BlockCount) * setting.BlockCountScale))
 	if derived.BlockCount != expectedCount {
@@ -93,5 +86,13 @@ func TestApplyDifficultyRejectsNonPositiveScale(t *testing.T) {
 
 	if _, err := ApplyDifficulty(base, setting); err == nil {
 		t.Fatalf("expected error for non-positive scale")
+	}
+}
+
+func assertFloatClose(t *testing.T, got, want float64, msg string) {
+	t.Helper()
+	const eps = 1e-9
+	if math.Abs(got-want) > eps {
+		t.Fatalf("%s: want %f, got %f", msg, want, got)
 	}
 }
