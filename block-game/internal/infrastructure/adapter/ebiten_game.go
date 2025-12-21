@@ -20,24 +20,26 @@ const (
 	sceneTitle gameScene = iota
 	scenePlaying
 	scenePaused
+	sceneGameOver
 )
 
 type EbitenGame struct {
-	usecase      *application.GameUsecase
-	renderer     *view.Renderer
-	scene        gameScene
-	selectedDiff domain.Difficulty
-	selectedIdx  int
-	options      []domain.Difficulty
-	descriptions map[domain.Difficulty]string
-	prevUp       bool
-	prevDown     bool
-	prevLeft     bool
-	prevRight    bool
-	prevEscape   bool
-	baseLayout   domain.LayoutConfig
-	input        application.InputPort
-	statusMsg    string
+	usecase        *application.GameUsecase
+	renderer       *view.Renderer
+	scene          gameScene
+	selectedDiff   domain.Difficulty
+	selectedIdx    int
+	options        []domain.Difficulty
+	descriptions   map[domain.Difficulty]string
+	prevUp         bool
+	prevDown       bool
+	prevLeft       bool
+	prevRight      bool
+	prevEscape     bool
+	prevEnterSpace bool
+	baseLayout     domain.LayoutConfig
+	input          application.InputPort
+	statusMsg      string
 }
 
 func NewEbitenGame(input application.InputPort) *EbitenGame {
@@ -68,7 +70,7 @@ func (g *EbitenGame) Update() error {
 	case sceneTitle:
 		g.handleTitleInput()
 		g.handleTitleMouse()
-		if ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeySpace) {
+		if g.edgeEnterOrSpace() {
 			if err := g.startGame(); err != nil {
 				log.Printf("failed to start game with difficulty %s: %v", g.selectedDiff, err)
 				return nil
@@ -81,10 +83,21 @@ func (g *EbitenGame) Update() error {
 			g.scene = scenePaused
 			return nil
 		}
-		return g.usecase.Update()
+		if err := g.usecase.Update(); err != nil {
+			return err
+		}
+		if g.usecase.State().GameOver {
+			g.scene = sceneGameOver
+		}
+		return nil
 	case scenePaused:
 		if g.edgeEscape() {
 			g.scene = scenePlaying
+		}
+		return nil
+	case sceneGameOver:
+		if g.edgeEnterOrSpace() {
+			g.resetToTitle()
 		}
 		return nil
 	default:
@@ -107,6 +120,12 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 		}
 		g.renderer.Render(screen, g.usecase.State())
 		g.renderPauseOverlay(screen)
+	case sceneGameOver:
+		if g.renderer == nil || g.usecase == nil {
+			return
+		}
+		g.renderer.Render(screen, g.usecase.State())
+		g.renderGameOverOverlay(screen)
 	}
 }
 
@@ -158,6 +177,14 @@ func (g *EbitenGame) renderPauseOverlay(screen *ebiten.Image) {
 	ebitenutil.DebugPrintAt(screen, diffLine, startX-24, startY+16)
 }
 
+func (g *EbitenGame) renderGameOverOverlay(screen *ebiten.Image) {
+	layout := g.currentLayout()
+	msg := "GAME OVER - Press Enter/Space to return"
+	startX := int(layout.ScreenW)/2 - 140
+	startY := int(layout.ScreenH)/2 + 32
+	ebitenutil.DebugPrintAt(screen, msg, startX, startY)
+}
+
 // handleTitleInput handles keyboard selection (up/down/left/right) on the title screen.
 func (g *EbitenGame) handleTitleInput() {
 	up := ebiten.IsKeyPressed(ebiten.KeyUp)
@@ -192,7 +219,7 @@ func (g *EbitenGame) handleTitleMouse() {
 	}
 
 	x, y := ebiten.CursorPosition()
-	layout := g.usecase.Layout()
+	layout := g.currentLayout()
 
 	startX := int(layout.ScreenW)/2 - 120
 	startY := int(layout.ScreenH)/2 - 40
@@ -221,6 +248,19 @@ func (g *EbitenGame) edgeEscape() bool {
 	esc := ebiten.IsKeyPressed(ebiten.KeyEscape)
 	defer func() { g.prevEscape = esc }()
 	return esc && !g.prevEscape
+}
+
+func (g *EbitenGame) edgeEnterOrSpace() bool {
+	enterSpace := ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeySpace)
+	defer func() { g.prevEnterSpace = enterSpace }()
+	return enterSpace && !g.prevEnterSpace
+}
+
+func (g *EbitenGame) resetToTitle() {
+	g.scene = sceneTitle
+	g.usecase = nil
+	g.renderer = nil
+	g.statusMsg = ""
 }
 
 func (g *EbitenGame) startGame() error {

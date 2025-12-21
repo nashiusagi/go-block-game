@@ -38,10 +38,10 @@
   - _Requirements: 2.2_
 
 - [ ] 4. 実装の境界整理（状態/入力/描画）
-- [ ] 4.1 シーン状態（Title/Playing/Paused/GameOver 等）の責務を明確化し、状態遷移を一箇所に集約する
+- [x] 4.1 シーン状態（Title/Playing/Paused/GameOver 等）の責務を明確化し、状態遷移を一箇所に集約する
   - `EbitenGame`（adapter）でシーン管理し、`GameUsecase` は Playing のみを担当する、など
   - _Requirements: 1.2,2.1,2.2_
-- [ ] 4.2 UI入力（選択/決定/ポーズ）とゲーム入力（左右移動）を衝突しない形で扱う
+- [x] 4.2 UI入力（選択/決定/ポーズ）とゲーム入力（左右移動）を衝突しない形で扱う
   - 例: シーンごとに入力ハンドリングを分ける／InputStateを拡張する／UIはebiten直接参照など、方針を設計に合わせて統一
   - _Requirements: 1.3,2.2_
 
