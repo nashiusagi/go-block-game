@@ -129,12 +129,18 @@ func updateItems(state *GameState, cfg LayoutConfig) {
 }
 
 func tryDropItem(state *GameState, cfg LayoutConfig, block *Block, rnd RandomSource) {
-	if len(state.Items) >= cfg.MaxItems {
-		return
+	// Multiball item lottery (independent)
+	if len(state.Items) < cfg.MaxItems && rnd.Float64() < cfg.ItemDropChance {
+		spawnItem(state, cfg, block, ItemTypeMultiball)
 	}
-	if rnd.Float64() >= cfg.ItemDropChance {
-		return
+	// Paddle-enlarge item lottery (independent)
+	if len(state.Items) < cfg.MaxItems && rnd.Float64() < cfg.PaddleEnlargeChance {
+		spawnItem(state, cfg, block, ItemTypePaddleEnlarge)
 	}
+}
+
+// spawnItem creates a new item of the given type at the block's position.
+func spawnItem(state *GameState, cfg LayoutConfig, block *Block, itemType ItemType) {
 	state.Items = append(state.Items, Item{
 		X:      block.X + cfg.BlockW/2 - cfg.ItemWidth/2,
 		Y:      block.Y + cfg.BlockH/2 - cfg.ItemHeight/2,
@@ -142,7 +148,7 @@ func tryDropItem(state *GameState, cfg LayoutConfig, block *Block, rnd RandomSou
 		Height: cfg.ItemHeight,
 		VY:     cfg.ItemFallSpeed,
 		Active: true,
-		Type:   ItemTypeMultiball,
+		Type:   itemType,
 	})
 }
 

@@ -25,7 +25,7 @@
   - _Requirements: 1.1, 2.1_
 
 - [ ] 3. アイテムスポーン拡張（tryDropItem）
-- [ ] 3.1 tryDropItem を拡張しパドル拡大アイテムの独立抽選を追加
+- [x] 3.1 tryDropItem を拡張しパドル拡大アイテムの独立抽選を追加
   - マルチボール抽選（既存 ItemDropChance）とパドル拡大抽選（PaddleEnlargeChance）を別々に実行
   - 共通の spawnItem ヘルパーで Item 生成を統一
   - MaxItems 上限チェックは全アイテム合計で適用
