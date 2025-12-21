@@ -26,6 +26,7 @@ type LayoutConfig struct {
 	ItemWidth                 float64
 	ItemHeight                float64
 	ItemFallSpeed             float64
+	Difficulty                Difficulty
 	Seed                      *int64
 }
 

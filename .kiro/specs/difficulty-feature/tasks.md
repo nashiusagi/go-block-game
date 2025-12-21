@@ -6,11 +6,11 @@
 
 ## Tasks
 - [ ] 1. 難易度設定の定義と検証
-- [ ] 1.1 Difficulty 列挙と DifficultySetting 構造体を追加し、EASY/NORMAL/HARD のスケールを定義する
+- [x] 1.1 Difficulty 列挙と DifficultySetting 構造体を追加し、EASY/NORMAL/HARD のスケールを定義する
   - スケール例: EASY (BallSpeed 0.8, BallRadius 1.0, PaddleWidth 1.1, PaddleSpeed 1.1, BlockSize 1.0, BlockCount 1.0), NORMAL (1.0,1.0,1.0,1.0,1.0,1.0), HARD (1.2,0.9,0.9,0.9,0.9,1.3)
   - BlockCount は HARD で増やし、BlockSize/BallRadius を縮小して面積を確保
   - _Requirements: 2.1,2.2,2.3,2.4,2.5,4.3_
-- [ ] 1.2 DifficultyValidator を実装し、難易度キーとスケールの範囲を検証する
+- [x] 1.2 DifficultyValidator を実装し、難易度キーとスケールの範囲を検証する
   - スケール範囲 (0, 10] でクランプし、0以下はエラー。BlockCount は面積に収まるよう上限をかける
   - 無効値は NORMAL にフォールバックし、ログ/エラーを出力
   - _Requirements: 3.3,4.1,4.2,4.3,4.4_

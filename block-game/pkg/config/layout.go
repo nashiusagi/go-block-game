@@ -50,6 +50,7 @@ func DefaultLayoutConfig() domain.LayoutConfig {
 		ItemWidth:      ItemWidth,
 		ItemHeight:     ItemHeight,
 		ItemFallSpeed:  ItemFallSpeed,
+		Difficulty:     domain.DifficultyNormal,
 		Seed:           nil,
 	}
 }
