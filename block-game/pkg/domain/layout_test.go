@@ -93,6 +93,18 @@ func TestGenerateBlocksInvalidConfig(t *testing.T) {
 	}
 }
 
+func TestGenerateBlocksInsufficientSpace(t *testing.T) {
+	cfg := baseLayout()
+	cfg.BlockW = 400
+	cfg.BlockH = 400
+	cfg.BlockCount = 5
+	cfg.MaxAttempts = 20
+
+	if _, err := GenerateBlocks(cfg, nil); err == nil {
+		t.Fatalf("expected error due to insufficient space for blocks")
+	}
+}
+
 func TestGenerateGridFallback(t *testing.T) {
 	cfg := baseLayout()
 	blocks := GenerateGridFallback(cfg)

@@ -16,11 +16,11 @@
   - _Requirements: 3.3,4.1,4.2,4.3,4.4_
 
 - [ ] 2. コンフィグ適用とレイアウト生成統合
-- [ ] 2.1 ApplyDifficulty を実装し、基準 LayoutConfig にスケールを適用して派生コンフィグを返す
+- [x] 2.1 ApplyDifficulty を実装し、基準 LayoutConfig にスケールを適用して派生コンフィグを返す
   - BallSpeed/Radius、PaddleWidth/Speed、BlockW/H、BlockCount、MaxAttempts をスケール
   - BlockCount 増加時は MaxAttempts を比例増加（例: count*10）し、面積不足なら BlockSize を再クランプ
   - _Requirements: 1.1,1.2,1.3,1.4,1.5,2.1,2.2,2.3,2.4,2.5,4.1,4.3_
-- [ ] 2.2 GenerateBlocks 統合を調整し、HARD のブロック増加・サイズ縮小でも配置が成立するようにする
+- [x] 2.2 GenerateBlocks 統合を調整し、HARD のブロック増加・サイズ縮小でも配置が成立するようにする
   - 面積チェックを追加し、成立しない場合はサイズクランプまたはフォールバック（ノーマル配置やグリッド）を選択
   - _Requirements: 2.4,2.5,4.1_
 
