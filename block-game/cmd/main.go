@@ -20,7 +20,7 @@ func main() {
 
 	layout, applied, err := config.LayoutWithDifficulty(*diffFlag)
 	if err != nil {
-		log.Printf("difficulty selection error (%v), applied: %s", err, applied)
+		log.Printf("difficulty selection error: requested=%q fallback=%s err=%v", *diffFlag, applied, err)
 	}
 
 	rnd := domain.NewRandomSource(layout.Seed)
