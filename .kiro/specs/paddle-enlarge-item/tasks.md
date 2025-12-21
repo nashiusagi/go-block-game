@@ -17,7 +17,7 @@
   - _Requirements: 2.1, 2.2, 2.4_
 
 - [ ] 2. Config 定数追加
-- [ ] 2.1 pkg/config/layout.go に PaddleEnlarge 関連定数を追加 (P)
+- [x] 2.1 pkg/config/layout.go に PaddleEnlarge 関連定数を追加 (P)
   - `PaddleEnlargeChance = 0.02`
   - `PaddleEnlargeDuration = 300` (5秒 @ 60FPS)
   - `PaddleEnlargeMultiplier = 3.0`

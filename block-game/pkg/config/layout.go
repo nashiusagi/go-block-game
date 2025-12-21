@@ -27,34 +27,42 @@ const (
 	ItemWidth         = 16.0
 	ItemHeight        = 12.0
 	MaxBalls          = 8
+
+	// Paddle-enlarge item settings
+	PaddleEnlargeChance     = 0.02 // 2% probability
+	PaddleEnlargeDuration   = 300  // 5 seconds @ 60FPS
+	PaddleEnlargeMultiplier = 3.0  // 3x paddle width
 )
 
 func DefaultLayoutConfig() domain.LayoutConfig {
 	return domain.LayoutConfig{
-		ScreenW:        ScreenWidth,
-		ScreenH:        ScreenHeight,
-		BlockW:         BlockWidth,
-		BlockH:         BlockHeight,
-		BlockRows:      BlockRows,
-		BlockCols:      BlockCols,
-		BlockSpacing:   BlockSpacing,
-		PaddleWidth:    PaddleWidth,
-		PaddleHeight:   PaddleHeight,
-		PaddleY:        PaddleY,
-		PaddleSpeed:    PaddleSpeed,
-		BallRadius:     BallRadius,
-		BallSpeed:      BallSpeed,
-		BlockCount:     BlockRows * BlockCols,
-		MinPaddleGap:   MinPaddleGap,
-		MaxAttempts:    MaxAttemptsFactor * BlockRows * BlockCols,
-		MaxBalls:       MaxBalls,
-		ItemDropChance: ItemDropChance,
-		MaxItems:       ItemMaxCount,
-		ItemWidth:      ItemWidth,
-		ItemHeight:     ItemHeight,
-		ItemFallSpeed:  ItemFallSpeed,
-		Difficulty:     domain.DifficultyNormal,
-		Seed:           nil,
+		ScreenW:                 ScreenWidth,
+		ScreenH:                 ScreenHeight,
+		BlockW:                  BlockWidth,
+		BlockH:                  BlockHeight,
+		BlockRows:               BlockRows,
+		BlockCols:               BlockCols,
+		BlockSpacing:            BlockSpacing,
+		PaddleWidth:             PaddleWidth,
+		PaddleHeight:            PaddleHeight,
+		PaddleY:                 PaddleY,
+		PaddleSpeed:             PaddleSpeed,
+		BallRadius:              BallRadius,
+		BallSpeed:               BallSpeed,
+		BlockCount:              BlockRows * BlockCols,
+		MinPaddleGap:            MinPaddleGap,
+		MaxAttempts:             MaxAttemptsFactor * BlockRows * BlockCols,
+		MaxBalls:                MaxBalls,
+		ItemDropChance:          ItemDropChance,
+		MaxItems:                ItemMaxCount,
+		ItemWidth:               ItemWidth,
+		ItemHeight:              ItemHeight,
+		ItemFallSpeed:           ItemFallSpeed,
+		PaddleEnlargeChance:     PaddleEnlargeChance,
+		PaddleEnlargeDuration:   PaddleEnlargeDuration,
+		PaddleEnlargeMultiplier: PaddleEnlargeMultiplier,
+		Difficulty:              domain.DifficultyNormal,
+		Seed:                    nil,
 	}
 }
 

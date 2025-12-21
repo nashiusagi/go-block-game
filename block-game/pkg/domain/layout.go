@@ -26,6 +26,9 @@ type LayoutConfig struct {
 	ItemWidth                 float64
 	ItemHeight                float64
 	ItemFallSpeed             float64
+	PaddleEnlargeChance       float64 // probability for paddle-enlarge item drop (e.g., 0.02 = 2%)
+	PaddleEnlargeDuration     int     // effect duration in ticks (e.g., 300 = 5 sec @ 60FPS)
+	PaddleEnlargeMultiplier   float64 // paddle width multiplier (e.g., 3.0)
 	Difficulty                Difficulty
 	Seed                      *int64
 }
