@@ -57,15 +57,15 @@
   - _Requirements: 3.2, 3.3_
 
 - [ ] 7. テスト
-- [ ] 7.1 tryDropItem のユニットテスト追加
+- [x] 7.1 tryDropItem のユニットテスト追加
   - 2%確率でパドル拡大アイテムがスポーンすること
   - マルチボールと独立に抽選されること
   - _Requirements: 1.1_
-- [ ] 7.2 applyPaddleEnlarge / updatePaddleEffect のユニットテスト追加 (P)
+- [x] 7.2 applyPaddleEnlarge / updatePaddleEffect のユニットテスト追加 (P)
   - 幅が3倍になり Active=true, RemainingTicks=300 になること
   - 300 ticks 後に元の幅に戻ること
   - 再取得でタイマーリセット、幅維持
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
-- [ ] 7.3 統合テスト: ブロック破壊→取得→効果終了フロー (P)
+- [x] 7.3 統合テスト: ブロック破壊→取得→効果終了フロー (P)
   - _Requirements: 1.x, 2.x_
 
