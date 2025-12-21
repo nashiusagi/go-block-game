@@ -26,7 +26,16 @@ func (r *Renderer) Render(screen *ebiten.Image, state *domain.GameState) {
 
 	for _, item := range state.Items {
 		if item.Active {
-			ebitenutil.DrawRect(screen, item.X, item.Y, item.Width, item.Height, color.RGBA{255, 200, 50, 255})
+			var itemColor color.RGBA
+			switch item.Type {
+			case domain.ItemTypeMultiball:
+				itemColor = color.RGBA{255, 200, 50, 255} // yellow/orange
+			case domain.ItemTypePaddleEnlarge:
+				itemColor = color.RGBA{50, 255, 100, 255} // green
+			default:
+				itemColor = color.RGBA{255, 200, 50, 255}
+			}
+			ebitenutil.DrawRect(screen, item.X, item.Y, item.Width, item.Height, itemColor)
 		}
 	}
 
@@ -37,13 +46,26 @@ func (r *Renderer) Render(screen *ebiten.Image, state *domain.GameState) {
 		}
 	}
 
-	ebitenutil.DrawRect(screen, state.Paddle.X, state.Paddle.Y, state.Paddle.Width, state.Paddle.Height, color.RGBA{255, 255, 255, 255})
+	// Draw paddle with color change when effect is active
+	paddleColor := color.RGBA{255, 255, 255, 255} // white (normal)
+	if state.PaddleEffect.Active {
+		paddleColor = color.RGBA{0, 255, 255, 255} // cyan (enlarged)
+	}
+	ebitenutil.DrawRect(screen, state.Paddle.X, state.Paddle.Y, state.Paddle.Width, state.Paddle.Height, paddleColor)
+
 	for _, ball := range state.Balls {
 		ebitenutil.DrawCircle(screen, ball.X, ball.Y, ball.Radius, color.RGBA{255, 255, 0, 255})
 	}
 
 	scoreText := "Score: " + fmt.Sprintf("%d", state.Score)
 	ebitenutil.DebugPrintAt(screen, scoreText, 0, 16)
+
+	// Show paddle effect indicator
+	if state.PaddleEffect.Active {
+		remainingSec := float64(state.PaddleEffect.RemainingTicks) / 60.0
+		effectText := fmt.Sprintf("PADDLE x%.0f (%.1fs)", state.PaddleEffect.Multiplier, remainingSec)
+		ebitenutil.DebugPrintAt(screen, effectText, 0, 32)
+	}
 
 	if state.GameOver {
 		gameOverText := "GAME OVER"

@@ -10,21 +10,39 @@ type Paddle struct {
 	Height float64
 }
 
+// ItemType represents the type of a falling item.
+type ItemType int
+
+const (
+	ItemTypeMultiball ItemType = iota
+	ItemTypePaddleEnlarge
+)
+
 type Item struct {
 	X, Y   float64
 	Width  float64
 	Height float64
 	VY     float64
 	Active bool
+	Type   ItemType
+}
+
+// PaddleEffect tracks the temporary paddle enlargement state.
+type PaddleEffect struct {
+	Active         bool
+	RemainingTicks int     // 60FPS: 5 seconds = 300 ticks
+	BaseWidth      float64 // original paddle width before effect
+	Multiplier     float64 // e.g., 3.0
 }
 
 type GameState struct {
-	Blocks   []Block
-	Balls    []Ball
-	Paddle   Paddle
-	Items    []Item
-	Score    int
-	GameOver bool
+	Blocks       []Block
+	Balls        []Ball
+	Paddle       Paddle
+	Items        []Item
+	PaddleEffect PaddleEffect
+	Score        int
+	GameOver     bool
 }
 
 type InputState struct {
@@ -68,6 +86,7 @@ func Advance(state *GameState, input InputState, cfg LayoutConfig, rnd RandomSou
 	}
 
 	updateItems(state, cfg)
+	updatePaddleEffect(state)
 
 	ballService.Advance(state, cfg, rnd)
 
@@ -97,7 +116,13 @@ func updateItems(state *GameState, cfg LayoutConfig) {
 		item.Y += item.VY
 
 		if rectsOverlap(item.X, item.Y, item.Width, item.Height, state.Paddle.X, state.Paddle.Y, state.Paddle.Width, state.Paddle.Height) {
-			applyMultiball(state, cfg)
+			// Apply effect based on item type
+			switch item.Type {
+			case ItemTypeMultiball:
+				applyMultiball(state, cfg)
+			case ItemTypePaddleEnlarge:
+				applyPaddleEnlarge(state, cfg)
+			}
 			item.Active = false
 		} else if item.Y > cfg.ScreenH {
 			item.Active = false
@@ -111,12 +136,18 @@ func updateItems(state *GameState, cfg LayoutConfig) {
 }
 
 func tryDropItem(state *GameState, cfg LayoutConfig, block *Block, rnd RandomSource) {
-	if len(state.Items) >= cfg.MaxItems {
-		return
+	// Multiball item lottery (independent)
+	if len(state.Items) < cfg.MaxItems && rnd.Float64() < cfg.ItemDropChance {
+		spawnItem(state, cfg, block, ItemTypeMultiball)
 	}
-	if rnd.Float64() >= cfg.ItemDropChance {
-		return
+	// Paddle-enlarge item lottery (independent)
+	if len(state.Items) < cfg.MaxItems && rnd.Float64() < cfg.PaddleEnlargeChance {
+		spawnItem(state, cfg, block, ItemTypePaddleEnlarge)
 	}
+}
+
+// spawnItem creates a new item of the given type at the block's position.
+func spawnItem(state *GameState, cfg LayoutConfig, block *Block, itemType ItemType) {
 	state.Items = append(state.Items, Item{
 		X:      block.X + cfg.BlockW/2 - cfg.ItemWidth/2,
 		Y:      block.Y + cfg.BlockH/2 - cfg.ItemHeight/2,
@@ -124,6 +155,7 @@ func tryDropItem(state *GameState, cfg LayoutConfig, block *Block, rnd RandomSou
 		Height: cfg.ItemHeight,
 		VY:     cfg.ItemFallSpeed,
 		Active: true,
+		Type:   itemType,
 	})
 }
 
@@ -153,4 +185,33 @@ func applyMultiball(state *GameState, cfg LayoutConfig) {
 	}
 
 	state.Balls = newBalls
+}
+
+// applyPaddleEnlarge activates the paddle enlargement effect.
+// If already active, it resets the duration timer.
+func applyPaddleEnlarge(state *GameState, cfg LayoutConfig) {
+	effect := &state.PaddleEffect
+	if !effect.Active {
+		// First activation: save base width and enlarge
+		effect.BaseWidth = state.Paddle.Width
+		effect.Multiplier = cfg.PaddleEnlargeMultiplier
+		state.Paddle.Width = effect.BaseWidth * effect.Multiplier
+	}
+	// (Re)set timer
+	effect.Active = true
+	effect.RemainingTicks = cfg.PaddleEnlargeDuration
+}
+
+// updatePaddleEffect decrements the effect timer and reverts paddle width when expired.
+func updatePaddleEffect(state *GameState) {
+	effect := &state.PaddleEffect
+	if !effect.Active {
+		return
+	}
+	effect.RemainingTicks--
+	if effect.RemainingTicks <= 0 {
+		state.Paddle.Width = effect.BaseWidth
+		effect.Active = false
+		effect.RemainingTicks = 0
+	}
 }
