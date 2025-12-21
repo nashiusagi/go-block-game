@@ -3,36 +3,53 @@ package adapter
 import (
 	"testing"
 
-	"block-game/internal/application"
-	"block-game/internal/infrastructure/view"
 	"block-game/pkg/config"
 	"block-game/pkg/domain"
 )
 
-type fakeRenderer struct {
-	calls int
-}
+// fakeInput satisfies application.InputPort for tests.
+type fakeInput struct{}
 
-func (f *fakeRenderer) Render(screen interface{}, state *domain.GameState) {
-	f.calls++
-}
+func (f *fakeInput) Read() domain.InputState { return domain.InputState{} }
 
-func TestEbitenGameLayout(t *testing.T) {
-	cfg := config.DefaultLayoutConfig()
-	usecase, err := application.NewGameUsecase(cfg, domain.NewRandomSource(cfg.Seed), &fakeInput{})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	r := view.NewRenderer(cfg)
-	game := NewEbitenGame(usecase, r)
+func TestLayoutUsesBaseConfigBeforeStart(t *testing.T) {
+	game := NewEbitenGame(&fakeInput{})
 
 	w, h := game.Layout(0, 0)
-	if w != int(cfg.ScreenW) || h != int(cfg.ScreenH) {
+	base := config.DefaultLayoutConfig()
+	if w != int(base.ScreenW) || h != int(base.ScreenH) {
 		t.Fatalf("unexpected layout size: %d x %d", w, h)
 	}
 }
 
-// fakeInput is reused from application tests.
-type fakeInput struct{}
+func TestStartGameUsesSelectedDifficulty(t *testing.T) {
+	game := NewEbitenGame(&fakeInput{})
+	game.selectedDiff = domain.DifficultyHard
 
-func (f *fakeInput) Read() domain.InputState { return domain.InputState{} }
+	if err := game.startGame(); err != nil {
+		t.Fatalf("startGame returned error: %v", err)
+	}
+
+	if game.usecase == nil || game.renderer == nil {
+		t.Fatalf("usecase or renderer not initialized")
+	}
+	if game.currentLayout().Difficulty != domain.DifficultyHard {
+		t.Fatalf("expected HARD difficulty, got %s", game.currentLayout().Difficulty)
+	}
+}
+
+func TestStartGameFallbackOnInvalidDifficulty(t *testing.T) {
+	game := NewEbitenGame(&fakeInput{})
+	game.selectedDiff = domain.Difficulty("UNKNOWN")
+
+	if err := game.startGame(); err != nil {
+		t.Fatalf("startGame returned error: %v", err)
+	}
+
+	if game.currentLayout().Difficulty != domain.DifficultyNormal {
+		t.Fatalf("expected fallback to NORMAL, got %s", game.currentLayout().Difficulty)
+	}
+	if game.statusMsg == "" {
+		t.Fatalf("expected status message on fallback, got empty")
+	}
+}
