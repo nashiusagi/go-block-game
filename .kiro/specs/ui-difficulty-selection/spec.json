@@ -1,0 +1,23 @@
+{
+  "feature_name": "ui-difficulty-selection",
+  "created_at": "2025-12-21T11:28:08+09:00",
+  "updated_at": "2025-12-21T11:29:56+09:00",
+  "language": "ja",
+  "phase": "requirements-generated",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": true
+    },
+    "design": {
+      "generated": false,
+      "approved": false
+    },
+    "tasks": {
+      "generated": false,
+      "approved": false
+    }
+  },
+  "ready_for_implementation": false
+}
+
