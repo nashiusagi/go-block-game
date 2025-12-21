@@ -1,0 +1,23 @@
+name: Check Blocking Review
+description: Check if critical issues were found and fail the workflow if blocking review is enabled
+
+inputs:
+  blocking-review:
+    description: 'Whether blocking review is enabled'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: ブロッキングレビューの結果を確認
+      shell: bash
+      run: |
+        echo "重大な問題がないか確認中..."
+        echo "CRITICAL_ISSUES_FOUND: ${CRITICAL_ISSUES_FOUND:-unset}"
+
+        if [ "${{ inputs.blocking-review }}" = "true" ] && [ "${CRITICAL_ISSUES_FOUND:-false}" = "true" ]; then
+          echo "❌ 重大な問題が見つかり、ブロッキングレビューが有効。ワークフローを失敗させる。"
+          exit 1
+        else
+          echo "✅ ブロック対象の問題は見つからなかった。"
+        fi

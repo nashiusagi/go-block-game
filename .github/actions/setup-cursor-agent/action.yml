@@ -1,0 +1,17 @@
+name: Setup Cursor Agent
+description: Install Cursor CLI and set git user information
+
+runs:
+  using: composite
+  steps:
+    - name: Install Cursor CLI
+      shell: bash
+      run: |
+        curl https://cursor.com/install -fsS | bash
+        echo "$HOME/.cursor/bin" >> $GITHUB_PATH
+
+    - name: Set git user information
+      shell: bash
+      run: |
+        git config user.name "Cursor Agent"
+        git config user.email "cursoragent@cursor.com"

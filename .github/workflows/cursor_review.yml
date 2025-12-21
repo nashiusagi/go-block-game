@@ -1,0 +1,72 @@
+name: Cursorによるコードレビュー
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  cursor-review:
+    if: github.event.label.name == 'Cursor'
+    name: Review PR with Cursor Agent
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Cursor Agent
+        uses: ./.github/actions/setup-cursor-agent
+
+      - name: Run Cursor Agent Review
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          MODEL: ${{ vars.CURSOR_MODEL || 'sonnet-4.5' }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BLOCKING_REVIEW: ${{ vars.BLOCKING_REVIEW || 'false' }}
+        run: |
+          # セキュリティチェック: 必要な環境変数が設定されているか確認
+          if [ -z "$CURSOR_API_KEY" ]; then
+            echo "❌ CURSOR_API_KEY が設定されていません"
+            exit 1
+          fi
+          
+          if [ -z "$GH_TOKEN" ]; then
+            echo "❌ GH_TOKEN が設定されていません"
+            exit 1
+          fi
+          
+          # リポジトリ名とPR番号の検証
+          REPO_NAME="${{ github.repository }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          
+          if [[ ! "$REPO_NAME" =~ ^[a-zA-Z0-9._-]+/[a-zA-Z0-9._-]+$ ]]; then
+            echo "❌ 無効なリポジトリ名: $REPO_NAME"
+            exit 1
+          fi
+          
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "❌ 無効なPR番号: $PR_NUMBER"
+            exit 1
+          fi
+          
+          # プロンプトファイルを読み込んで変数を置換
+          PROMPT=$(cat .github/workflows/prompt/code-review.md | \
+            sed "s|{{REPOSITORY}}|${{ github.repository }}|g" | \
+            sed "s|{{PR_NUMBER}}|${{ github.event.pull_request.number }}|g" | \
+            sed "s|{{PR_HEAD_SHA}}|${{ github.event.pull_request.head.sha }}|g" | \
+            sed "s|{{PR_BASE_SHA}}|${{ github.event.pull_request.base.sha }}|g" | \
+            sed "s|{{BLOCKING_REVIEW}}|${BLOCKING_REVIEW}|g")
+          
+          cursor-agent --force --model "$MODEL" --output-format=text --print "$PROMPT"
+
+      - name: Check Blocking Review
+        uses: ./.github/actions/check-blocking-review
+        with:
+          blocking-review: ${{ vars.BLOCKING_REVIEW || 'false' }}
