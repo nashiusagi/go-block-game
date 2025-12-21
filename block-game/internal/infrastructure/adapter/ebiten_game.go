@@ -19,6 +19,7 @@ type gameScene int
 const (
 	sceneTitle gameScene = iota
 	scenePlaying
+	scenePaused
 )
 
 type EbitenGame struct {
@@ -33,6 +34,7 @@ type EbitenGame struct {
 	prevDown     bool
 	prevLeft     bool
 	prevRight    bool
+	prevEscape   bool
 	baseLayout   domain.LayoutConfig
 	input        application.InputPort
 	statusMsg    string
@@ -75,7 +77,16 @@ func (g *EbitenGame) Update() error {
 		}
 		return nil
 	case scenePlaying:
+		if g.edgeEscape() {
+			g.scene = scenePaused
+			return nil
+		}
 		return g.usecase.Update()
+	case scenePaused:
+		if g.edgeEscape() {
+			g.scene = scenePlaying
+		}
+		return nil
 	default:
 		return nil
 	}
@@ -90,6 +101,12 @@ func (g *EbitenGame) Draw(screen *ebiten.Image) {
 			return
 		}
 		g.renderer.Render(screen, g.usecase.State())
+	case scenePaused:
+		if g.renderer == nil || g.usecase == nil {
+			return
+		}
+		g.renderer.Render(screen, g.usecase.State())
+		g.renderPauseOverlay(screen)
 	}
 }
 
@@ -126,6 +143,19 @@ func (g *EbitenGame) renderTitle(screen *ebiten.Image) {
 	if g.statusMsg != "" {
 		ebitenutil.DebugPrintAt(screen, g.statusMsg, startX, startY+96)
 	}
+}
+
+func (g *EbitenGame) renderPauseOverlay(screen *ebiten.Image) {
+	layout := g.currentLayout()
+	// 半透明オーバーレイは簡略化のため省略し、テキストのみ表示
+	pauseTitle := "PAUSED"
+	diffLine := fmt.Sprintf("Difficulty: %s", layout.Difficulty)
+
+	startX := int(layout.ScreenW)/2 - 60
+	startY := int(layout.ScreenH)/2 - 20
+
+	ebitenutil.DebugPrintAt(screen, pauseTitle, startX, startY)
+	ebitenutil.DebugPrintAt(screen, diffLine, startX-24, startY+16)
 }
 
 // handleTitleInput handles keyboard selection (up/down/left/right) on the title screen.
@@ -185,6 +215,12 @@ func (g *EbitenGame) moveSelection(delta int) {
 	}
 	g.selectedIdx = (g.selectedIdx + delta + count) % count
 	g.selectedDiff = g.options[g.selectedIdx]
+}
+
+func (g *EbitenGame) edgeEscape() bool {
+	esc := ebiten.IsKeyPressed(ebiten.KeyEscape)
+	defer func() { g.prevEscape = esc }()
+	return esc && !g.prevEscape
 }
 
 func (g *EbitenGame) startGame() error {
